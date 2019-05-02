@@ -11,7 +11,7 @@ extension PDFGenerator {
     func drawText(_ container: Container, text: String, spacing: CGFloat, textMaxWidth: CGFloat = 0) {
         let attributes = generateDefaultTextAttributes(container, spacing: spacing)
         
-        drawAttributedText(container, text: NSAttributedString(string: text, attributes: attributes), textMaxWidth: textMaxWidth)
+        drawAttributedText(container, text: NSAttributedString(string: text, attributes: convertToOptionalNSAttributedStringKeyDictionary(attributes)), textMaxWidth: textMaxWidth)
     }
     
     func drawAttributedText(_ container: Container, text: NSAttributedString, textMaxWidth: CGFloat = 0) {
@@ -77,8 +77,19 @@ extension PDFGenerator {
         paragraphStyle.lineSpacing = spacing
         
         return [
-            NSFontAttributeName: fonts[container]!,
-            NSParagraphStyleAttributeName: paragraphStyle
+            convertFromNSAttributedStringKey(NSAttributedString.Key.font): fonts[container]!,
+            convertFromNSAttributedStringKey(NSAttributedString.Key.paragraphStyle): paragraphStyle
         ]
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
 }

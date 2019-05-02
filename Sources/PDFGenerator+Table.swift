@@ -35,11 +35,11 @@ extension PDFGenerator {
             for (colIdx, column) in row.enumerated() {
                 let cellStyle = getCellStyle(tableHeight: data.count + styleIndexOffset, style: style, row: styleIndexOffset + rowIdx, column: colIdx, newPageBreak: newPageBreak)
                 let attributes: [String: AnyObject] = [
-                    NSForegroundColorAttributeName: cellStyle.textColor,
-                    NSFontAttributeName: cellStyle.font
+                    convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): cellStyle.textColor,
+                    convertFromNSAttributedStringKey(NSAttributedString.Key.font): cellStyle.font
                 ]
                 
-                let text = NSAttributedString(string: column, attributes: attributes)
+                let text = NSAttributedString(string: column, attributes: convertToOptionalNSAttributedStringKeyDictionary(attributes))
                 let width = relativeColumnWidth[colIdx] * totalWidth
                 let result = calculateCellFrame(CGPoint(x: x + margin + padding, y: y + maxHeaderHeight() + headerSpace + margin + padding), width: width - 2 * margin - 2 * padding, text: text, alignment: alignments[rowIdx][colIdx])
                 
@@ -123,12 +123,12 @@ extension PDFGenerator {
                 let cellStyle = getCellStyle(tableHeight: data.count + styleIndexOffset, style: style, row: styleIndexOffset + rowIdx, column: colIdx, newPageBreak: newPageBreak)
                 
                 let attributes: [String: AnyObject] = [
-                    NSForegroundColorAttributeName: cellStyle.textColor,
-                    NSFontAttributeName: cellStyle.font
+                    convertFromNSAttributedStringKey(NSAttributedString.Key.foregroundColor): cellStyle.textColor,
+                    convertFromNSAttributedStringKey(NSAttributedString.Key.font): cellStyle.font
                 ]
                 
                 let textFrame = framesInThisPage[rowIdx][colIdx]
-                let attributedText = NSAttributedString(string: text, attributes: attributes)
+                let attributedText = NSAttributedString(string: text, attributes: convertToOptionalNSAttributedStringKeyDictionary(attributes))
                 // the last line of text is hidden if 30 is not added
                 attributedText.draw(in: CGRect(origin: textFrame.origin, size: CGSize(width: textFrame.width, height: textFrame.height + 20)))
             }
@@ -187,4 +187,15 @@ extension PDFGenerator {
             return style.contentStyle
         }
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSAttributedStringKey(_ input: NSAttributedString.Key) -> String {
+	return input.rawValue
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToOptionalNSAttributedStringKeyDictionary(_ input: [String: Any]?) -> [NSAttributedString.Key: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (NSAttributedString.Key(rawValue: key), value)})
 }
