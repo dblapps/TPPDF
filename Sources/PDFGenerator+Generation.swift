@@ -54,7 +54,7 @@ extension PDFGenerator {
         case let .setFont(font):
             fonts[container] = font
             break
-        case .createNewPage():
+        case .createNewPage:
             generateNewPage()
             break
         case .setMinimumOffset(let points):
